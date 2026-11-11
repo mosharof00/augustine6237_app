@@ -49,29 +49,35 @@ class _BottomNav extends GetView<MainPageController> {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColor.surface,
+        border: const Border(
+          top: BorderSide(color: AppColor.borderSubtle, width: 1),
+        ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withAlpha(10),
-            blurRadius: 20,
+            color: Colors.black.withValues(alpha: 0.35),
+            blurRadius: 18,
             offset: const Offset(0, -4),
           ),
         ],
       ),
       child: SafeArea(
+        top: false,
         child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 10.h),
+          padding: EdgeInsets.fromLTRB(20.w, 8.h, 20.w, 8.h),
           child: Obx(
             () => GNav(
               selectedIndex: controller.selectedIndex.value,
               onTabChange: controller.changePage,
-              backgroundColor: Colors.white,
+              backgroundColor: AppColor.surface,
               activeColor: Colors.white,
-              color: AppColor.hintText,
+              color: AppColor.textSecondary,
               tabBackgroundColor: AppColor.primary,
-              gap: 6.w,
-              padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 10.h),
-              duration: const Duration(milliseconds: 300),
+              gap: 8.w,
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              tabBorderRadius: 14,
+              padding: EdgeInsets.symmetric(horizontal: 22.w, vertical: 10.h),
+              duration: const Duration(milliseconds: 220),
               tabs: List.generate(_tabs.length, (index) {
                 final tab = _tabs[index];
                 final isActive = controller.selectedIndex.value == index;
@@ -79,15 +85,15 @@ class _BottomNav extends GetView<MainPageController> {
                   icon: Icons.circle, // required but overridden by leading
                   leading: customSvgImage(
                     imagePath: isActive ? tab.fillIcon : tab.outlineIcon,
-                    color: isActive ? Colors.white : AppColor.hintText,
-                    width: 20.w,
-                    height: 20.w,
+                    color: isActive ? Colors.white : AppColor.textSecondary,
+                    width: 18.w,
+                    height: 18.w,
                   ),
                   text: tab.label,
                   textStyle: TextStyle(
-                    fontSize: 13.sp,
+                    fontSize: 12.sp,
                     fontWeight: FontWeight.w600,
-                    color: Colors.white,
+                    color: isActive ? Colors.white : AppColor.textSecondary,
                   ),
                 );
               }),

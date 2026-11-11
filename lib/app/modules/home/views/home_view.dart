@@ -15,144 +15,172 @@ class HomeView extends GetView<HomeController> {
       appBar: AppBar(
         backgroundColor: AppColor.background,
         elevation: 0,
-        title: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-              decoration: BoxDecoration(
-                color: AppColor.actionBack.withValues(alpha: 0.15),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: const Text(
-                'BetSocial',
-                style: TextStyle(
-                  color: AppColor.actionBack,
-                  fontWeight: FontWeight.w900,
-                  fontSize: 18,
-                  letterSpacing: -0.5,
-                ),
-              ),
+        titleSpacing: 16,
+        title: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+          decoration: BoxDecoration(
+            color: AppColor.actionBack.withValues(alpha: 0.15),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: const Text(
+            'BetSocial',
+            style: TextStyle(
+              color: AppColor.actionBack,
+              fontWeight: FontWeight.w900,
+              fontSize: 16,
+              letterSpacing: -0.5,
             ),
-          ],
+          ),
         ),
         actions: [
           Obx(() {
-            if (controller.isLoggedIn) {
-              final bal = controller.wallet.value?.balance ??
-                  controller.user.value?.balance ??
-                  '0.00';
-              return Center(
-                child: InkWell(
-                  onTap: () => _showWalletSheet(context),
-                  borderRadius: BorderRadius.circular(12),
-                  child: Container(
-                    margin: const EdgeInsets.only(right: 8),
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                    decoration: BoxDecoration(
-                      color: AppColor.surfaceSubtle,
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: AppColor.borderSubtle),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Icon(Icons.account_balance_wallet,
-                            size: 14, color: AppColor.statusSuccess),
-                        const SizedBox(width: 4),
-                        Text(
-                          '\$$bal',
-                          style: const TextStyle(
-                            color: AppColor.statusSuccess,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 12,
-                          ),
+            if (!controller.isLoggedIn) return const SizedBox.shrink();
+            final bal = controller.wallet.value?.balance ??
+                controller.user.value?.balance ??
+                '0.00';
+            return Padding(
+              padding: const EdgeInsets.only(right: 4),
+              child: InkWell(
+                onTap: () => _showWalletSheet(context),
+                borderRadius: BorderRadius.circular(12),
+                child: Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+                  decoration: BoxDecoration(
+                    color: AppColor.surfaceSubtle,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: AppColor.borderSubtle),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(Icons.account_balance_wallet,
+                          size: 13, color: AppColor.statusSuccess),
+                      const SizedBox(width: 4),
+                      Text(
+                        '\$$bal',
+                        style: const TextStyle(
+                          color: AppColor.statusSuccess,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 11,
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 ),
-              );
-            }
-            return const SizedBox.shrink();
-          }),
-          Obx(() {
-            if (controller.isLoggedIn) {
-              final kyc = controller.kycStatus.value;
-              final isVerified = kyc?.isVerified == true;
-              final isPending = kyc?.isPending == true;
-              final color = isVerified
-                  ? AppColor.statusSuccess
-                  : (isPending ? AppColor.statusPending : AppColor.textDim);
-              final label =
-                  isVerified ? 'KYC' : (isPending ? 'KYC...' : 'Verify');
-
-              return Center(
-                child: InkWell(
-                  onTap: () => _showKycVerificationDialog(context),
-                  borderRadius: BorderRadius.circular(12),
-                  child: Container(
-                    margin: const EdgeInsets.only(right: 6),
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
-                    decoration: BoxDecoration(
-                      color: color.withValues(alpha: 0.15),
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: color.withValues(alpha: 0.5)),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          isVerified ? Icons.verified : Icons.shield_outlined,
-                          size: 13,
-                          color: color,
-                        ),
-                        const SizedBox(width: 3),
-                        Text(
-                          label,
-                          style: TextStyle(
-                            color: color,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 11,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              );
-            }
-            return const SizedBox.shrink();
+              ),
+            );
           }),
           IconButton(
-            onPressed: () => _showDisputesSheet(context),
-            icon: const Icon(Icons.gavel_outlined, color: AppColor.textSecondary),
-            tooltip: 'Disputes & Arbitration',
-          ),
-          IconButton(
-            onPressed: () => _showAdminPanelSheet(context),
-            icon: const Icon(Icons.admin_panel_settings_outlined, color: AppColor.textSecondary),
-            tooltip: 'Admin Control Panel',
-          ),
-          IconButton(
-            onPressed: () => _showJoinInviteModal(context),
-            icon: const Icon(Icons.vpn_key_outlined, color: AppColor.textSecondary),
-            tooltip: 'Join with Invite Code',
-          ),
-          IconButton(
+            visualDensity: VisualDensity.compact,
             onPressed: () => _showCreateBetModal(context),
             icon: const Icon(Icons.add_circle, color: AppColor.actionBack),
             tooltip: 'Create Bet',
           ),
-          IconButton(
-            onPressed: controller.onAuthAction,
-            icon: Icon(
-              controller.isLoggedIn ? Icons.logout : Icons.login,
-              color: AppColor.textSecondary,
-            ),
-            tooltip: controller.isLoggedIn ? 'Logout' : 'Login',
+          PopupMenuButton<String>(
+            tooltip: 'More',
+            color: AppColor.surface,
+            icon: const Icon(Icons.more_vert, color: AppColor.textSecondary),
+            onSelected: (value) {
+              switch (value) {
+                case 'kyc':
+                  _showKycVerificationDialog(context);
+                  break;
+                case 'disputes':
+                  _showDisputesSheet(context);
+                  break;
+                case 'admin':
+                  _showAdminPanelSheet(context);
+                  break;
+                case 'invite':
+                  _showJoinInviteModal(context);
+                  break;
+                case 'auth':
+                  controller.onAuthAction();
+                  break;
+              }
+            },
+            itemBuilder: (context) => [
+              PopupMenuItem(
+                value: 'kyc',
+                enabled: controller.isLoggedIn,
+                child: Obx(() {
+                  final kyc = controller.kycStatus.value;
+                  final isVerified = kyc?.isVerified == true;
+                  final isPending = kyc?.isPending == true;
+                  final label = isVerified
+                      ? 'KYC Verified'
+                      : (isPending ? 'KYC Pending' : 'Verify KYC');
+                  return Row(
+                    children: [
+                      Icon(
+                        isVerified ? Icons.verified : Icons.shield_outlined,
+                        size: 18,
+                        color: AppColor.textSecondary,
+                      ),
+                      const SizedBox(width: 10),
+                      Text(label,
+                          style: const TextStyle(color: AppColor.textPrimary)),
+                    ],
+                  );
+                }),
+              ),
+              const PopupMenuItem(
+                value: 'disputes',
+                child: Row(
+                  children: [
+                    Icon(Icons.gavel_outlined,
+                        size: 18, color: AppColor.textSecondary),
+                    SizedBox(width: 10),
+                    Text('Disputes',
+                        style: TextStyle(color: AppColor.textPrimary)),
+                  ],
+                ),
+              ),
+              const PopupMenuItem(
+                value: 'invite',
+                child: Row(
+                  children: [
+                    Icon(Icons.vpn_key_outlined,
+                        size: 18, color: AppColor.textSecondary),
+                    SizedBox(width: 10),
+                    Text('Join with Code',
+                        style: TextStyle(color: AppColor.textPrimary)),
+                  ],
+                ),
+              ),
+              const PopupMenuItem(
+                value: 'admin',
+                child: Row(
+                  children: [
+                    Icon(Icons.admin_panel_settings_outlined,
+                        size: 18, color: AppColor.textSecondary),
+                    SizedBox(width: 10),
+                    Text('Admin Panel',
+                        style: TextStyle(color: AppColor.textPrimary)),
+                  ],
+                ),
+              ),
+              PopupMenuItem(
+                value: 'auth',
+                child: Row(
+                  children: [
+                    Icon(
+                      controller.isLoggedIn ? Icons.logout : Icons.login,
+                      size: 18,
+                      color: AppColor.textSecondary,
+                    ),
+                    const SizedBox(width: 10),
+                    Text(
+                      controller.isLoggedIn ? 'Logout' : 'Login',
+                      style: const TextStyle(color: AppColor.textPrimary),
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
+          const SizedBox(width: 4),
         ],
       ),
       body: RefreshIndicator(
@@ -192,27 +220,27 @@ class HomeView extends GetView<HomeController> {
                 ),
               ),
 
-              const SizedBox(height: 12),
+              const SizedBox(height: 10),
 
               // Category Pills Carousel
               _buildCategoryChips(),
 
-              const SizedBox(height: 10),
+              const SizedBox(height: 8),
 
               // Country & Featured Filter Row
               _buildCountryAndFeaturedFilter(),
 
-              const SizedBox(height: 10),
+              const SizedBox(height: 8),
 
               // Trending Topics Carousel
               _buildTrendingTopics(),
 
-              const SizedBox(height: 12),
+              const SizedBox(height: 10),
 
               // Sort Tabs Row
               _buildSortTabs(),
 
-              const SizedBox(height: 14),
+              const SizedBox(height: 12),
 
               // Bets Stream
               Obx(() {
@@ -339,11 +367,11 @@ class HomeView extends GetView<HomeController> {
 
   Widget _buildCountryAndFeaturedFilter() {
     final countries = [
-      {'code': 'GLOBAL', 'label': '🌐 Global'},
-      {'code': 'US', 'label': '🇺🇸 USA'},
-      {'code': 'GB', 'label': '🇬🇧 UK'},
-      {'code': 'NG', 'label': '🇳🇬 Nigeria'},
-      {'code': 'CA', 'label': '🇨🇦 Canada'},
+      {'code': 'GLOBAL', 'label': 'Global'},
+      {'code': 'US', 'label': 'USA'},
+      {'code': 'GB', 'label': 'UK'},
+      {'code': 'NG', 'label': 'Nigeria'},
+      {'code': 'CA', 'label': 'Canada'},
     ];
 
     return SingleChildScrollView(
@@ -500,23 +528,22 @@ class HomeView extends GetView<HomeController> {
 
   Widget _buildSortTabs() {
     return Obx(
-      () => Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Row(
-            children: [
-              _buildSortButton('trending', 'Trending'),
-              const SizedBox(width: 8),
-              _buildSortButton('ending_soon', 'Ending Soon'),
-              const SizedBox(width: 8),
-              _buildSortButton('newest', 'Newest'),
-            ],
-          ),
-          Text(
-            '${controller.bets.length} Bets',
-            style: const TextStyle(color: AppColor.textDim, fontSize: 12),
-          ),
-        ],
+      () => SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Row(
+          children: [
+            _buildSortButton('trending', 'Trending'),
+            const SizedBox(width: 12),
+            _buildSortButton('ending_soon', 'Ending Soon'),
+            const SizedBox(width: 12),
+            _buildSortButton('newest', 'Newest'),
+            const SizedBox(width: 16),
+            Text(
+              '${controller.bets.length} markets',
+              style: const TextStyle(color: AppColor.textDim, fontSize: 12),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -547,100 +574,43 @@ class HomeView extends GetView<HomeController> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // Header: Category tag + Deadline pill
+          // Header: tags wrap cleanly; timer stays visible
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                decoration: BoxDecoration(
-                  color: AppColor.surfaceSubtle,
-                  borderRadius: BorderRadius.circular(6),
-                ),
-                child: Text(
-                  bet.category.toUpperCase(),
-                  style: const TextStyle(
-                    color: AppColor.actionBack,
-                    fontSize: 10,
-                    fontWeight: FontWeight.bold,
-                  ),
+              Expanded(
+                child: Wrap(
+                  spacing: 6,
+                  runSpacing: 6,
+                  children: [
+                    _betChip(
+                      bet.category.toUpperCase(),
+                      foreground: AppColor.actionBack,
+                    ),
+                    if (bet.isFeatured)
+                      _betChip(
+                        'FEATURED',
+                        foreground: Colors.amber,
+                        background: Colors.amber.withValues(alpha: 0.2),
+                        border: Colors.amber.withValues(alpha: 0.4),
+                        icon: Icons.auto_awesome,
+                      ),
+                    if (bet.country != 'GLOBAL')
+                      _betChip(bet.country),
+                    if (bet.isPrivate && bet.inviteCode != null)
+                      _betChip(
+                        bet.inviteCode!,
+                        foreground: AppColor.actionBack,
+                        background:
+                            AppColor.actionBack.withValues(alpha: 0.15),
+                        icon: Icons.lock_outline,
+                      ),
+                  ],
                 ),
               ),
-              if (bet.isFeatured) ...[
-                const SizedBox(width: 6),
-                Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                  decoration: BoxDecoration(
-                    color: Colors.amber.withValues(alpha: 0.2),
-                    borderRadius: BorderRadius.circular(6),
-                    border:
-                        Border.all(color: Colors.amber.withValues(alpha: 0.4)),
-                  ),
-                  child: const Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(Icons.auto_awesome, size: 10, color: Colors.amber),
-                      SizedBox(width: 3),
-                      Text(
-                        'FEATURED',
-                        style: TextStyle(
-                          color: Colors.amber,
-                          fontSize: 10,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-              if (bet.country != 'GLOBAL') ...[
-                const SizedBox(width: 6),
-                Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
-                  decoration: BoxDecoration(
-                    color: AppColor.surfaceSubtle,
-                    borderRadius: BorderRadius.circular(6),
-                  ),
-                  child: Text(
-                    bet.country,
-                    style: const TextStyle(
-                      color: AppColor.textSecondary,
-                      fontSize: 10,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-              ],
-              if (bet.isPrivate && bet.inviteCode != null) ...[
-                const SizedBox(width: 6),
-                Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                  decoration: BoxDecoration(
-                    color: AppColor.actionBack.withValues(alpha: 0.15),
-                    borderRadius: BorderRadius.circular(6),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const Icon(Icons.lock_outline,
-                          size: 10, color: AppColor.actionBack),
-                      const SizedBox(width: 3),
-                      Text(
-                        bet.inviteCode!,
-                        style: const TextStyle(
-                          color: AppColor.actionBack,
-                          fontSize: 10,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
+              const SizedBox(width: 8),
               Row(
+                mainAxisSize: MainAxisSize.min,
                 children: [
                   const Icon(Icons.timer_outlined,
                       size: 13, color: AppColor.statusPending),
@@ -683,122 +653,54 @@ class HomeView extends GetView<HomeController> {
             ),
           ],
 
-          // Matched Status & Odds Pill
-          Row(
+          // Status pills + odds (wrap to avoid horizontal overflow)
+          Wrap(
+            spacing: 6,
+            runSpacing: 6,
+            crossAxisAlignment: WrapCrossAlignment.center,
             children: [
               InkWell(
                 onTap: () => _showMatchedStatusSheet(context, bet),
                 borderRadius: BorderRadius.circular(6),
-                child: Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                  decoration: BoxDecoration(
-                    color: AppColor.surfaceSubtle,
-                    borderRadius: BorderRadius.circular(6),
-                    border: Border.all(color: AppColor.borderSubtle),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const Icon(Icons.sync_alt,
-                          size: 11, color: AppColor.actionBack),
-                      const SizedBox(width: 4),
-                      Text(
-                        bet.matchedPoolDouble > 0
-                            ? '\$${bet.matchedPool} Matched'
-                            : 'Open Pool',
-                        style: const TextStyle(
-                          color: AppColor.textSecondary,
-                          fontSize: 11,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                      const SizedBox(width: 4),
-                      const Icon(Icons.info_outline,
-                          size: 11, color: AppColor.textDim),
-                    ],
-                  ),
+                child: _betChip(
+                  bet.matchedPoolDouble > 0
+                      ? '\$${bet.matchedPool} Matched'
+                      : 'Open Pool',
+                  icon: Icons.sync_alt,
+                  foreground: AppColor.textSecondary,
                 ),
               ),
-              const SizedBox(width: 6),
               InkWell(
                 onTap: () => _showEscrowSheet(context, bet),
                 borderRadius: BorderRadius.circular(6),
-                child: Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                  decoration: BoxDecoration(
-                    color: bet.status == 'RESOLVED'
-                        ? AppColor.statusSuccess.withValues(alpha: 0.15)
-                        : AppColor.surfaceSubtle,
-                    borderRadius: BorderRadius.circular(6),
-                    border: Border.all(
-                      color: bet.status == 'RESOLVED'
-                          ? AppColor.statusSuccess.withValues(alpha: 0.4)
-                          : AppColor.borderSubtle,
-                    ),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(
-                        bet.status == 'RESOLVED'
-                            ? Icons.verified
-                            : Icons.lock_outline,
-                        size: 11,
-                        color: bet.status == 'RESOLVED'
-                            ? AppColor.statusSuccess
-                            : AppColor.statusPending,
-                      ),
-                      const SizedBox(width: 4),
-                      Text(
-                        bet.status == 'RESOLVED' ? 'Settled' : 'Escrow',
-                        style: TextStyle(
-                          color: bet.status == 'RESOLVED'
-                              ? AppColor.statusSuccess
-                              : AppColor.textSecondary,
-                          fontSize: 11,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ],
-                  ),
+                child: _betChip(
+                  bet.status == 'RESOLVED' ? 'Settled' : 'Escrow',
+                  icon: bet.status == 'RESOLVED'
+                      ? Icons.verified
+                      : Icons.lock_outline,
+                  foreground: bet.status == 'RESOLVED'
+                      ? AppColor.statusSuccess
+                      : AppColor.textSecondary,
+                  background: bet.status == 'RESOLVED'
+                      ? AppColor.statusSuccess.withValues(alpha: 0.15)
+                      : AppColor.surfaceSubtle,
+                  border: bet.status == 'RESOLVED'
+                      ? AppColor.statusSuccess.withValues(alpha: 0.4)
+                      : AppColor.borderSubtle,
                 ),
               ),
-              const SizedBox(width: 6),
               InkWell(
                 onTap: () => _showCommissionSheet(context, bet),
                 borderRadius: BorderRadius.circular(6),
-                child: Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
-                  decoration: BoxDecoration(
-                    color: AppColor.surfaceSubtle,
-                    borderRadius: BorderRadius.circular(6),
-                    border: Border.all(color: AppColor.borderSubtle),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const Icon(Icons.percent,
-                          size: 10, color: AppColor.actionBack),
-                      const SizedBox(width: 3),
-                      Text(
-                        '${bet.commissionRate}%',
-                        style: const TextStyle(
-                          color: AppColor.textSecondary,
-                          fontSize: 10,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ],
-                  ),
+                child: _betChip(
+                  '${bet.commissionRate}%',
+                  icon: Icons.percent,
+                  foreground: AppColor.textSecondary,
                 ),
               ),
-              const Spacer(),
               if (bet.betType != 'CUSTOM')
                 Text(
-                  'Back @ ${bet.backOdds.toStringAsFixed(2)}x · Oppose @ ${bet.opposeOdds.toStringAsFixed(2)}x',
+                  '${bet.backOdds.toStringAsFixed(2)}x / ${bet.opposeOdds.toStringAsFixed(2)}x',
                   style: const TextStyle(
                     color: AppColor.textDim,
                     fontSize: 11,
@@ -987,29 +889,80 @@ class HomeView extends GetView<HomeController> {
     );
   }
 
+  Widget _betChip(
+    String label, {
+    Color foreground = AppColor.textSecondary,
+    Color background = AppColor.surfaceSubtle,
+    Color border = AppColor.borderSubtle,
+    IconData? icon,
+  }) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+      decoration: BoxDecoration(
+        color: background,
+        borderRadius: BorderRadius.circular(6),
+        border: Border.all(color: border),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (icon != null) ...[
+            Icon(icon, size: 11, color: foreground),
+            const SizedBox(width: 4),
+          ],
+          Text(
+            label,
+            style: TextStyle(
+              color: foreground,
+              fontSize: 10,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildRatioBar(BetModel bet) {
-    final backPct = bet.backPercent;
-    final opposePct = bet.opposePercent;
+    final backPct = bet.backPercent.clamp(0, 100).toDouble();
+    // Round for display so labels always sum to 100.
+    final backLabel = backPct.round().clamp(0, 100);
+    final opposeLabel = (100 - backLabel).clamp(0, 100);
+    final backFlex = backLabel == 0 && opposeLabel == 0
+        ? 1
+        : (backLabel == 0 ? 0 : backLabel);
+    final opposeFlex = backLabel == 0 && opposeLabel == 0
+        ? 1
+        : (opposeLabel == 0 ? 0 : opposeLabel);
 
     return Column(
       children: [
         Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(
-              'Back: \$${bet.backPool} (${backPct.toStringAsFixed(0)}%)',
-              style: const TextStyle(
-                color: AppColor.actionBack,
-                fontSize: 11,
-                fontWeight: FontWeight.bold,
+            Expanded(
+              child: Text(
+                'Back: \$${bet.backPool} ($backLabel%)',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(
+                  color: AppColor.actionBack,
+                  fontSize: 11,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
-            Text(
-              'Oppose: \$${bet.opposePool} (${opposePct.toStringAsFixed(0)}%)',
-              style: const TextStyle(
-                color: AppColor.actionOppose,
-                fontSize: 11,
-                fontWeight: FontWeight.bold,
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                'Oppose: \$${bet.opposePool} ($opposeLabel%)',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                textAlign: TextAlign.end,
+                style: const TextStyle(
+                  color: AppColor.actionOppose,
+                  fontSize: 11,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
           ],
@@ -1021,14 +974,16 @@ class HomeView extends GetView<HomeController> {
             height: 6,
             child: Row(
               children: [
-                Expanded(
-                  flex: (backPct * 10).toInt(),
-                  child: Container(color: AppColor.actionBack),
-                ),
-                Expanded(
-                  flex: (opposePct * 10).toInt(),
-                  child: Container(color: AppColor.actionOppose),
-                ),
+                if (backFlex > 0)
+                  Expanded(
+                    flex: backFlex,
+                    child: Container(color: AppColor.actionBack),
+                  ),
+                if (opposeFlex > 0)
+                  Expanded(
+                    flex: opposeFlex,
+                    child: Container(color: AppColor.actionOppose),
+                  ),
               ],
             ),
           ),

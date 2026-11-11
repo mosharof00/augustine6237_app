@@ -286,10 +286,11 @@ class BetModel {
     return ((backPoolDouble / total) * 100).clamp(0.0, 100.0);
   }
 
+  /// Keep Back + Oppose display percents totaling 100 (avoids 63+38 rounding).
   double get opposePercent {
     final total = totalPoolDouble;
     if (total <= 0) return 50.0;
-    return ((opposePoolDouble / total) * 100).clamp(0.0, 100.0);
+    return (100.0 - backPercent).clamp(0.0, 100.0);
   }
 
   String get timeRemainingText {
